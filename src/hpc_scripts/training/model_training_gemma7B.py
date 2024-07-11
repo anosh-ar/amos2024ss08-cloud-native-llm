@@ -1,8 +1,7 @@
 from transformers import (AutoModelForCausalLM,
                           AutoTokenizer,
                           BitsAndBytesConfig,
-                          TrainingArguments,
-                          EarlyStoppingCallback
+                          TrainingArguments
                           )
 from trl import SFTTrainer
 from peft import LoraConfig
@@ -20,15 +19,14 @@ login(HF_TOKEN, add_to_git_credential=True)
 model_id = "google/gemma-7b-it"
 
 bnb_config = BitsAndBytesConfig(
-    load_in_4bit=True,
-    bnb_4bit_quant_type="nf4",
-    bnb_4bit_compute_dtype=torch.bfloat16
+    load_in_8bit=True,
+    bnb_8bit_quant_type="nf4",
+    bnb_8bit_compute_dtype=torch.bfloat16
 )
 
 dataset = load_dataset(
     "Kubermatic/Merged_QAs", split="train")
 dataset.shuffle(42)
-dataset = dataset.train_test_split(test_size=0.2)
 
 tokenizer = AutoTokenizer.from_pretrained(model_id, padding_side='right')
 # TODO: Check if this can be changed to AutoModelForQuestionAnswering with GEMMA
@@ -66,8 +64,7 @@ training_arguments = TrainingArguments(
     load_best_model_at_end=True,
     eval_accumulation_steps=1,
     evaluation_strategy='steps',
-    eval_steps=500,
-    per_device_eval_batch_size=4
+    eval_steps=10,
     # debug="underflow_overflow"
 )
 
@@ -107,8 +104,6 @@ trainer = SFTTrainer(
     formatting_func=formatting_func,
     tokenizer=tokenizer,
     max_seq_length=max_seq_length,
-    callbacks=[EarlyStoppingCallback(early_stopping_patience=15)],
-    eval_dataset=dataset["test"],
 )
 trainer.train()
 print("Model is trained")
