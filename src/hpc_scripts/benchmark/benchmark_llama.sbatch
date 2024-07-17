@@ -1,11 +1,11 @@
 #!/bin/bash -l
 #SBATCH --job-name=christian
 #SBATCH --ntasks=1
-#SBATCH --gres=gpu:rtx2080ti:4
+#SBATCH --gres=gpu:a100:1 -p a100
 #SBATCH --output=R-%x.%j.out
 #SBATCH --error=R-%x.%j.err
 #SBATCH --mail-type=end,fail 
-#SBATCH --time=24:00:00
+#SBATCH --time=01:15:00
 #SBATCH --export=NONE
 unset SLURM_EXPORT_ENV
 
@@ -30,11 +30,18 @@ cd "$TMPDIR"
 mkdir ${WORK}/$SLURM_JOB_ID
 
 # copy input file from location where job was submitted, and run 
-cp -r ${SLURM_SUBMIT_DIR}/benchmark_results_cncf.py .
+cp -r ${SLURM_SUBMIT_DIR}/benchmark_results_llama.py .
 mkdir -p output/
 
+(
+  while true; do
+    nvidia-smi > ${SLURM_SUBMIT_DIR}/gpu_usage_${SLURM_JOB_ID}.log
+    sleep 60
+  done
+) &
+
 # Run training script (with data copied to node)
-torchrun benchmark_results_cncf.py 
+torchrun benchmark_results_llama.py
 
 # Create a directory on $HOME and copy the results from our training
 mkdir ${HOME}/$SLURM_JOB_ID
