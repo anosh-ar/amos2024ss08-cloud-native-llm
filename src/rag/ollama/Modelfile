@@ -1,0 +1,22 @@
+# Ollama model definition for DeepCNCFQuantized (fine-tuned Gemma 1.1 7B IT, Q4_K_M, ~5.3 GB).
+# Created by setup_ollama.ps1:  ollama create deepcncf -f src/rag/ollama/Modelfile
+FROM ./ggml-model-Q4_K_M.gguf
+
+# Gemma chat format (Gemma has no system role; system text is sent as a user turn).
+TEMPLATE """{{- range $i, $_ := .Messages }}
+{{- $last := eq (len (slice $.Messages $i)) 1 }}
+{{- if or (eq .Role "user") (eq .Role "system") }}<start_of_turn>user
+{{ .Content }}<end_of_turn>
+{{ if $last }}<start_of_turn>model
+{{ end }}
+{{- else if eq .Role "assistant" }}<start_of_turn>model
+{{ .Content }}{{ if not $last }}<end_of_turn>
+{{ end }}
+{{- end }}
+{{- end }}"""
+
+PARAMETER stop "<end_of_turn>"
+PARAMETER stop "<start_of_turn>"
+# RAG prompts (4 chunks x ~400 tokens + question) need far more than LocalAI's old 512.
+PARAMETER num_ctx 4096
+PARAMETER temperature 0.2
