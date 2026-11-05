@@ -1,6 +1,6 @@
-# DeepCNCF + RAG (LangChain)
+# Retrieval-Augmented Generation (LangChain)
 
-Retrieval-Augmented Generation on top of DeepCNCF. Before the model answers, relevant passages
+This module is the answering stage of DeepCNCF (see the architecture diagram in the [project README](../../README.md)). Before the model answers, relevant passages
 from the scraped CNCF corpus ([cncf-raw-data-for-llm-training](https://huggingface.co/datasets/Kubermatic/cncf-raw-data-for-llm-training))
 are retrieved and put into the prompt, so answers are grounded in the documentation and cite their sources.
 Everything runs locally on CPU. No GPU or HPC is needed.
