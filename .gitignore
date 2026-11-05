@@ -58,3 +58,9 @@ sources/
 venv/
 
 model/
+# RAG pipeline (src/rag)
+.venv-rag/
+src/rag/index/
+src/rag/output/
+src/rag/.env
+src/rag/ollama/*.gguf

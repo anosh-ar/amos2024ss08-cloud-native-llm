@@ -1,5 +1,5 @@
 name: DeepCNCFQuantized
-context_size: 512
+context_size: 4096  # was 512; RAG prompts with retrieved context need ~2k tokens
 f16: true
 threads: 14
 gpu_layers: 90
