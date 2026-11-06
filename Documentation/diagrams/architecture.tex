@@ -36,14 +36,16 @@
 % ---------------- Fine-tuning (top row) ----------------
 \node[box=trainC] (qa) at ($(corpus.east)+(3.0,2.0)$) {Q\&A generation\\[-1pt]{\scriptsize\color{muted} Gemma}};
 \node[box=trainC, right=of qa] (ft) {LoRA fine-tuning\\[-1pt]{\scriptsize\color{muted} Gemma 2B / 7B / 9B}};
-\node[key=trainC, right=of ft] (model) {DeepCNCF};
 
-% ---------------- RAG (bottom row) ----------------
+% ---------------- Retrieval (bottom row) ----------------
 \node[box=ragC] (emb) at ($(corpus.east)+(3.0,-2.0)$) {Embedding\\[-1pt]{\scriptsize\color{muted} bge-small}};
 \node[box=ragC, right=of emb] (index) {Vector index\\[-1pt]{\scriptsize\color{muted} Chroma}};
 \node[box=ragC, right=of index] (retr) {Retriever\\[-1pt]{\scriptsize\color{muted} top-$k$ chunks}};
-\node[key=ragC, right=of retr] (gen) {Answer\\[-1pt]generation};
-\node[box=ragC, right=of gen] (out) {Answer\\[-1pt]{\scriptsize\color{muted} + sources}};
+\node[box=ragC, right=of retr] (prompt) {Prompt\\[-1pt]{\scriptsize\color{muted} question + chunks}};
+
+% ---------------- DeepCNCF: fed by fine-tuning AND retrieval, writes the answer ----------------
+\node[key=trainC, right=of prompt, minimum height=14mm] (deep) {DeepCNCF\\[-1pt]{\scriptsize\color{muted}\normalfont generates the answer}};
+\node[box=ragC, right=of deep] (out) {Answer\\[-1pt]{\scriptsize\color{muted} + sources}};
 
 % ---------------- Flows ----------------
 \draw[flow] (src) -- (scrape);
@@ -51,25 +53,29 @@
 \draw[flow] (corpus.east) -- ++(8mm,0) |- (qa.west);
 \draw[flow] (corpus.east) -- ++(8mm,0) |- (emb.west);
 \draw[flow] (qa) -- (ft);
-\draw[flow] (ft) -- (model);
 \draw[flow] (emb) -- (index);
 \draw[flow] (index) -- (retr);
-\draw[flow] (retr) -- (gen);
-\draw[flow] (model.east) -| (gen.north);
-\draw[flow] (gen) -- (out);
-\draw[flow] ($(retr.south)+(0,-9mm)$) node[below, sub] {user question} -- (retr.south);
+\draw[flow] (retr) -- (prompt);
+\draw[flow] (ft.east) -| node[pos=0.8, right, sub] {fine-tuned model} (deep.north);
+\draw[flow] (prompt) -- (deep);
+\draw[flow] (deep) -- (out);
+% the user question is used twice: to search (retriever) and inside the prompt
+\coordinate (q) at ($(retr.south)+(0,-10mm)$);
+\draw[flow] (q) node[below, sub] {user question} -- (retr.south);
+\draw[flow] ($(q)+(0,4mm)$) -| (prompt.south);
+\fill[muted] ($(q)+(0,4mm)$) circle (0.9mm);
 
 % ---------------- Panels ----------------
 \begin{scope}[on background layer]
   % white canvas first, so the image reads well in GitHub dark mode
   \fill[white] ($(current bounding box.south west)+(-6mm,-6mm)$) rectangle ($(current bounding box.north east)+(6mm,12mm)$);
   \node[panel=dataC, fit=(src)(scrape)(corpus)] (pData) {};
-  \node[panel=trainC, fit=(qa)(ft)(model)] (pTrain) {};
-  \node[panel=ragC, fit=(emb)(index)(retr)(gen)(out)] (pRag) {};
+  \node[panel=trainC, fit=(qa)(ft)] (pTrain) {};
+  \node[panel=ragC, fit=(emb)(index)(retr)(prompt)] (pRag) {};
 \end{scope}
 \node[title=dataC]  at (pData.north west)  {DATA PIPELINE};
 \node[title=trainC] at (pTrain.north west) {FINE-TUNING};
-\node[title=ragC]   at (pRag.north west)   {RETRIEVAL-AUGMENTED GENERATION (LangChain)};
+\node[title=ragC]   at (pRag.north west)   {RETRIEVAL (LangChain)};
 
 \end{tikzpicture}
 \end{document}
