@@ -89,11 +89,9 @@
 \badges{corpus}{dataC}{1}{huggingface}
 \badges{qa}{modelC}{2}{gemma,stackoverflow}
 \badges{ft}{modelC}{2}{gemma,huggingface}
-% serve: wide dark llama.cpp wordmark (GGUF quantization + the engine under Ollama/LocalAI) next to Ollama
-\node[badge=modelC, fill=black!93, minimum width=32mm] (serve-b1) at ($(serve.north)+(-0.7,0)$)
-  {\includegraphics[height=6mm]{icons/llamacpp}};
-\node[badge=modelC, minimum width=10mm] (serve-b2) at ($(serve.north)+(1.75,0)$)
-  {\includegraphics[width=6.2mm,height=6.2mm,keepaspectratio]{icons/ollama}};
+% serve: llama.cpp mark (white shape) on a dark round badge
+\node[badge=modelC, fill=black!93, minimum width=10mm] (serve-b1) at (serve.north)
+  {\includegraphics[width=5.6mm]{icons/llamacpp-mark}};
 \badges{index}{ragC}{1}{chroma}
 \badges{retr}{ragC}{1}{langchain}
 \badges{prompt}{ragC}{1}{langchain}
