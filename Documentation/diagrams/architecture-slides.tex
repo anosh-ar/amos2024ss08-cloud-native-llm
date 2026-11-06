@@ -53,22 +53,25 @@
 \card{scrape}{0, 2.0}{dataC}{Scraping \& chunking}{Scrapy, Python}
 \node[keycard=dataC] (corpus) at (0,-1.6) {{\large\bfseries CNCF corpus}\\[1pt]{\normalsize\color{muted}Hugging Face dataset}};
 
-% (2) model - top row
+% (2) model - top row (spread over the same width as the RAG row)
 \card{qa}{6.9, 5.6}{modelC}{Q\&A generation}{Gemma}
-\card{ft}{12.6, 5.6}{modelC}{Fine-tuning}{LoRA, Gemma 2B/7B/9B}
-\node[keycard=modelC] (model) at (18.3,5.6) {{\large\bfseries DeepCNCF}\\[1pt]{\normalsize\color{muted}fine-tuned Gemma}};
-\card{serve}{24.0, 5.6}{modelC}{Model serving}{Ollama, LocalAI}
+\card{ft}{15.45, 5.6}{modelC}{LoRA fine-tuning}{Gemma 2B/7B/9B}
+\card{serve}{24.0, 5.6}{modelC}{Quantize \& serve}{GGUF, Ollama / LocalAI}
 
-% (3) RAG - bottom row
+% (3) retrieval - bottom row
 \card{emb}{6.9,-1.6}{ragC}{Embedding}{bge-small}
 \card{index}{12.6,-1.6}{ragC}{Vector index}{Chroma}
 \card{retr}{18.3,-1.6}{ragC}{Retriever}{top-$k$ relevant chunks}
-\node[keycard=ragC] (gen) at (24.0,-1.6) {{\large\bfseries Answer generation}\\[1pt]{\normalsize\color{muted}LangChain}};
+\card{prompt}{24.0,-1.6}{ragC}{Prompt}{question + chunks}
+
+% (4) DeepCNCF: the one model that writes the answer - fed by fine-tuning AND retrieval
+\node[keycard=modelC, minimum width=52mm, text width=48mm, minimum height=30mm, line width=2.6pt] (deep) at (30.4,2.0)
+  {{\rule{0pt}{6.5mm}\Large\bfseries DeepCNCF}\\[2pt]{\normalsize\color{muted}fine-tuned model\\generates the answer}};
 
 % user
-\node[card=askC, minimum width=40mm, text width=36mm, minimum height=14mm] (user) at (18.3,-6.1)
+\node[card=askC, minimum width=40mm, text width=36mm, minimum height=14mm] (user) at (18.3,-6.6)
   {{\large\bfseries User}};
-\node[keycard=askC, minimum height=14mm] (answer) at (24.0,-6.1)
+\node[keycard=askC, minimum height=14mm] (answer) at (30.4,-6.6)
   {{\large\bfseries Answer}\\[1pt]{\normalsize\color{muted}with sources}};
 
 % ------------------------------------------------------------- logos
@@ -77,12 +80,12 @@
 \badges{corpus}{dataC}{1}{huggingface}
 \badges{qa}{modelC}{1}{google}
 \badges{ft}{modelC}{2}{pytorch,huggingface}
-\badges{model}{modelC}{1}{huggingface}
 \badges{serve}{modelC}{1}{ollama}
 \badges{emb}{ragC}{1}{huggingface}
 \badges{index}{ragC}{1}{chroma}
 \badges{retr}{ragC}{1}{langchain}
-\badges{gen}{ragC}{1}{langchain}
+\badges{prompt}{ragC}{1}{langchain}
+\badges{deep}{modelC}{1}{huggingface}
 
 % ------------------------------------------------------------- flows
 \draw[flow] (src) -- (scrape);
@@ -90,16 +93,20 @@
 \draw[flow] (corpus.east) -- ++(12mm,0) |- (qa.west);
 \draw[flow] (corpus) -- (emb);
 \draw[flow] (qa) -- (ft);
-\draw[flow] (ft) -- (model);
-\draw[flow] (model) -- (serve);
+\draw[flow] (ft) -- (serve);
 \draw[flow] (emb) -- (index);
 \draw[flow] (index) -- (retr);
-\draw[flow] (serve) -- (gen-b1);
+\draw[flow, draw=modelC, line width=2.4pt] (serve.east) -| node[pos=0.75, right, font=\normalsize\bfseries, text=modelC] {model} (deep-b1);
 
-% question path (highlighted)
-\draw[ask] (user) -- node[right, font=\normalsize\bfseries, text=askC] {question} (retr);
-\draw[ask] (retr) -- (gen);
-\draw[ask] (gen) -- (answer);
+% question path (highlighted): question -> retriever & prompt -> DeepCNCF -> answer -> user
+\coordinate (fork) at ($(user.north)+(0,1.3)$);
+\draw[ask] (user.north) -- (retr.south);
+\draw[ask] (fork) -| (prompt.south);
+\fill[askC] (fork) circle (1.6mm);
+\node[font=\normalsize\bfseries, text=askC, left] at ($(fork)+(-1mm,0)$) {question};
+\draw[ask] (retr) -- (prompt);
+\draw[ask] (prompt.east) -- ++(9mm,0) |- (deep.west);
+\draw[ask] (deep) -- (answer);
 \draw[ask] (answer) -- (user);
 
 % ------------------------------------------------------------- panels
@@ -107,12 +114,12 @@
   % white canvas first (transparent PNGs look grey on some slide themes), then the panels
   \fill[white] ($(current bounding box.south west)+(-10mm,-8mm)$) rectangle ($(current bounding box.north east)+(10mm,12mm)$);
   \node[panel=dataC, fit=(src)(scrape)(corpus)] (pData) {};
-  \node[panel=modelC, fit=(qa)(ft)(model)(serve)] (pModel) {};
-  \node[panel=ragC, fit=(emb)(index)(retr)(gen)] (pRag) {};
+  \node[panel=modelC, fit=(qa)(ft)(serve)] (pModel) {};
+  \node[panel=ragC, fit=(emb)(index)(retr)(prompt)] (pRag) {};
 \end{scope}
 \node[header=dataC]  at ($(pData.north west)+(5mm,0)$)  {\stepnum{dataC}{1}\ \ Data pipeline};
 \node[header=modelC] at ($(pModel.north west)+(5mm,0)$) {\stepnum{modelC}{2}\ \ Fine-tuning \& serving};
-\node[header=ragC]   at ($(pRag.north west)+(5mm,0)$)   {\stepnum{ragC}{3}\ \ Retrieval-augmented generation};
+\node[header=ragC]   at ($(pRag.north west)+(5mm,0)$)   {\stepnum{ragC}{3}\ \ Retrieval (LangChain)};
 
 \end{tikzpicture}
 \end{document}
