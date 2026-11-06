@@ -9,6 +9,7 @@ respective owners and are used here only to identify the tools in the architectu
 | `deepcncf.png` | DeepCNCF (team logo) | [Deliverables/sprint-01/team-logo.png](../../../Deliverables/sprint-01/team-logo.png) | this project (MIT) |
 | `gemma.png` | Gemma | Gemma artwork supplied by the project team, cropped to a circle | Google brand asset |
 | `langchain` | LangChain | Logo file (parrot + chain) supplied by the project team (`langchain-seeklogo.svg`) | LangChain brand asset |
+| `llamacpp` | llama.cpp | `cover-llama-cpp-dark.svg` supplied by the project team, cropped to the logo (viewBox `2290 930 2900 640`) | llama.cpp brand asset (MIT-licensed project) |
 | `refresh` | "re-run periodically" symbol | [Lucide](https://lucide.dev/icons/refresh-cw) `refresh-cw` (lucide-static 0.469.0), recoloured | ISC |
 | `cncf` | Cloud Native Computing Foundation | [Simple Icons](https://simpleicons.org/?q=cncf) (`cdn.simpleicons.org/cncf`) | CC0 1.0 |
 | `stackoverflow` | Stack Overflow | [Simple Icons](https://simpleicons.org/?q=stackoverflow) | CC0 1.0 |
