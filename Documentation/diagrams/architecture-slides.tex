@@ -13,7 +13,7 @@
 \definecolor{dataC}{HTML}{2563EB}
 \definecolor{modelC}{HTML}{EA580C}
 \definecolor{ragC}{HTML}{059669}
-\definecolor{askC}{HTML}{7C3AED}
+\definecolor{askC}{HTML}{475569}   % neutral slate for the user / question / answer path
 \definecolor{ink}{HTML}{111827}
 \definecolor{muted}{HTML}{4B5563}
 \definecolor{line}{HTML}{9CA3AF}
@@ -79,8 +79,8 @@
 % user
 \node[card=askC, minimum width=40mm, text width=36mm, minimum height=14mm, inner ysep=3mm] (user) at (12.6,-6.6)
   {{\large\bfseries User}};
-\node[keycard=askC, minimum height=14mm, inner ysep=3mm] (answer) at (25.0,-6.6)
-  {{\large\bfseries Answer}\\[1pt]{\normalsize\color{muted}with sources}};
+\node[keycard=askC, minimum width=60mm, text width=56mm, minimum height=14mm, inner ysep=3mm] (answer) at (25.0,-6.6)
+  {{\large\bfseries CNCF-grounded answer}\\[1pt]{\normalsize\color{muted}with cited CNCF sources}};
 
 % ------------------------------------------------------------- logos
 \badges{src}{dataC}{3}{cncf,stackoverflow,github}
