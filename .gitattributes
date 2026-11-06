@@ -1,0 +1,3 @@
+# Never convert line endings in binary assets (diagram logos, images)
+*.pdf binary
+*.png binary
