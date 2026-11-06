@@ -66,7 +66,7 @@
 % (2) model - top row
 \card{qa}{6.9, 5.6}{modelC}{Q\&A generation}{94,056 pairs}  % 84,949 Gemma-generated + 9,107 StackOverflow (Merged_QAs)
 \card{ft}{12.6, 5.6}{modelC}{LoRA fine-tuning}{Gemma 2B/7B/9B}
-\card{serve}{18.3, 5.6}{modelC}{Quantize \& serve}{GGUF, Ollama / LocalAI}
+\card{serve}{18.3, 5.6}{modelC}{Quantize \& serve}{llama.cpp / LocalAI}
 
 % (3) retrieval - bottom row
 \card{index}{6.9,-1.6}{ragC}{Vector index}{Chroma, bge-small}
@@ -89,7 +89,11 @@
 \badges{corpus}{dataC}{1}{huggingface}
 \badges{qa}{modelC}{2}{gemma,stackoverflow}
 \badges{ft}{modelC}{2}{gemma,huggingface}
-\badges{serve}{modelC}{1}{ollama}
+% serve: wide dark llama.cpp wordmark (GGUF quantization + the engine under Ollama/LocalAI) next to Ollama
+\node[badge=modelC, fill=black!93, minimum width=32mm] (serve-b1) at ($(serve.north)+(-0.7,0)$)
+  {\includegraphics[height=6mm]{icons/llamacpp}};
+\node[badge=modelC, minimum width=10mm] (serve-b2) at ($(serve.north)+(1.75,0)$)
+  {\includegraphics[width=6.2mm,height=6.2mm,keepaspectratio]{icons/ollama}};
 \badges{index}{ragC}{1}{chroma}
 \badges{retr}{ragC}{1}{langchain}
 \badges{prompt}{ragC}{1}{langchain}
