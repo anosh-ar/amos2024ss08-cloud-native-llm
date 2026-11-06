@@ -25,9 +25,9 @@
 \newcommand{\iconsize}[1]{\ifcsname isz-#1\endcsname\csname isz-#1\endcsname\else 6.2mm\fi}
 \newcommand{\badgewidth}[1]{\ifcsname bw-#1\endcsname\csname bw-#1\endcsname\else 10mm\fi}
 
-% \card{id}{x,y}{colour}{title}{subtitle}
-\newcommand{\card}[5]{%
-  \node[card=#3] (#1) at (#2) {{\large\bfseries #4}\\[1pt]{\normalsize\color{muted}#5}};}
+% \card[extra style]{id}{x,y}{colour}{title}{subtitle}
+\newcommand{\card}[6][]{%
+  \node[card=#4, #1] (#2) at (#3) {{\large\bfseries #5}\\[1pt]{\normalsize\color{muted}#6}};}
 % \badges{card id}{colour}{number of logos}{logo1,logo2,...} - white logo badges on the card's top edge
 \newcommand{\badges}[4]{%
   \foreach \ic [count=\j] in {#4} {
@@ -54,13 +54,14 @@
     header/.style={fill=#1, text=white, rounded corners=5pt, font=\large\bfseries,
                    inner xsep=3.5mm, inner ysep=2mm, anchor=west},
     note/.style={font=\normalsize\bfseries},
+    wide/.style={minimum width=54mm, text width=50mm},   % data-pipeline column
 ]
 
 % ------------------------------------------------------------- cards
 % (1) data pipeline - left column, flowing down; re-run periodically to keep the corpus current
-\card{src}{0,  5.6}{dataC}{CNCF Landscape}{docs, READMEs, PDFs}
-\card{scrape}{0, 2.0}{dataC}{Scraping \& chunking}{Scrapy, Python}
-\node[keycard=dataC] (corpus) at (0,-1.6) {{\large\bfseries CNCF corpus}\\[1pt]{\normalsize\color{muted}Hugging Face dataset}};
+\card[wide]{src}{-0.6, 5.6}{dataC}{CNCF Landscape}{docs, READMEs, PDFs}
+\card[wide]{scrape}{-0.6, 2.0}{dataC}{Scraping \& harmonizing}{Scrapy, Python}
+\node[keycard=dataC, wide] (corpus) at (-0.6,-1.6) {{\large\bfseries CNCF corpus}\\[1pt]{\normalsize\color{muted}Hugging Face dataset}};
 
 % (2) model - top row
 \card{qa}{6.9, 5.6}{modelC}{Q\&A generation}{94,056 pairs}  % 84,949 Gemma-generated + 9,107 StackOverflow (Merged_QAs)
