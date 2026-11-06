@@ -18,16 +18,23 @@
 \definecolor{muted}{HTML}{4B5563}
 \definecolor{line}{HTML}{9CA3AF}
 
+% Per-logo size inside a badge (default 6.2mm) and badge width (default 10mm = circle).
+\expandafter\def\csname isz-gemma\endcsname{9.6mm}      % round image that fills the badge
+\expandafter\def\csname isz-langchain\endcsname{13mm}   % wide 2:1 logo ...
+\expandafter\def\csname bw-langchain\endcsname{16mm}    % ... in a pill-shaped badge
+\newcommand{\iconsize}[1]{\ifcsname isz-#1\endcsname\csname isz-#1\endcsname\else 6.2mm\fi}
+\newcommand{\badgewidth}[1]{\ifcsname bw-#1\endcsname\csname bw-#1\endcsname\else 10mm\fi}
+
 % \card{id}{x,y}{colour}{title}{subtitle}
 \newcommand{\card}[5]{%
   \node[card=#3] (#1) at (#2) {{\large\bfseries #4}\\[1pt]{\normalsize\color{muted}#5}};}
-% \badges{card id}{colour}{number of icons}{icon1,icon2,...}  - white logo circles on the card's top edge
+% \badges{card id}{colour}{number of logos}{logo1,logo2,...} - white logo badges on the card's top edge
 \newcommand{\badges}[4]{%
   \foreach \ic [count=\j] in {#4} {
-    \node[badge=#2] (#1-b\j) at ($(#1.north)+({(\j-(#3+1)/2)*1.4},0)$)  % 14 mm apart
-      {\includegraphics[width=6.2mm,height=6.2mm,keepaspectratio]{icons/\ic}};
+    \node[badge=#2, minimum width=\badgewidth{\ic}] (#1-b\j) at ($(#1.north)+({(\j-(#3+1)/2)*1.4},0)$)  % 14 mm apart
+      {\includegraphics[width=\iconsize{\ic},height=\iconsize{\ic},keepaspectratio]{icons/\ic}};
   }}
-% \step{colour}{n} - white numbered circle for panel headers
+% \stepnum{colour}{n} - white numbered circle for panel headers
 \newcommand{\stepnum}[2]{\tikz[baseline=(s.base)]\node[circle, fill=white, text=#1, inner sep=0pt,
   minimum size=5.5mm, font=\normalsize\bfseries] (s) {#2};}
 
@@ -38,74 +45,74 @@
                  align=center, inner ysep=5.5mm, text=ink,   % room for the logo badges
                  drop shadow={opacity=0.12, shadow xshift=0.7mm, shadow yshift=-0.9mm}},
     keycard/.style={card=#1, fill=#1!10, line width=2pt},
-    badge/.style={circle, draw=#1, fill=white, line width=1.2pt, minimum size=10mm, inner sep=0pt},
+    badge/.style={rectangle, rounded corners=5mm, draw=#1, fill=white, line width=1.2pt,
+                  minimum height=10mm, inner sep=0pt},
     flow/.style={-{Stealth[length=3.4mm, width=2.8mm]}, line width=1.6pt, draw=line, rounded corners=5pt},
     ask/.style={flow, draw=askC, line width=2.4pt},
     panel/.style={fill=#1!5, draw=#1!35, line width=1pt, rounded corners=12pt,
                   inner xsep=6mm, inner ysep=13mm},
     header/.style={fill=#1, text=white, rounded corners=5pt, font=\large\bfseries,
                    inner xsep=3.5mm, inner ysep=2mm, anchor=west},
+    note/.style={font=\normalsize\bfseries},
 ]
 
 % ------------------------------------------------------------- cards
-% (1) data pipeline - left column, flowing down
+% (1) data pipeline - left column, flowing down; re-run periodically to keep the corpus current
 \card{src}{0,  5.6}{dataC}{CNCF Landscape}{docs, READMEs, PDFs}
 \card{scrape}{0, 2.0}{dataC}{Scraping \& chunking}{Scrapy, Python}
 \node[keycard=dataC] (corpus) at (0,-1.6) {{\large\bfseries CNCF corpus}\\[1pt]{\normalsize\color{muted}Hugging Face dataset}};
 
-% (2) model - top row (spread over the same width as the RAG row)
-\card{qa}{6.9, 5.6}{modelC}{Q\&A generation}{Gemma}
-\card{ft}{15.45, 5.6}{modelC}{LoRA fine-tuning}{Gemma 2B/7B/9B}
-\card{serve}{24.0, 5.6}{modelC}{Quantize \& serve}{GGUF, Ollama / LocalAI}
+% (2) model - top row
+\card{qa}{6.9, 5.6}{modelC}{Q\&A generation}{94,056 pairs}  % 84,949 Gemma-generated + 9,107 StackOverflow (Merged_QAs)
+\card{ft}{12.6, 5.6}{modelC}{LoRA fine-tuning}{Gemma 2B/7B/9B}
+\card{serve}{18.3, 5.6}{modelC}{Quantize \& serve}{GGUF, Ollama / LocalAI}
 
 % (3) retrieval - bottom row
-\card{emb}{6.9,-1.6}{ragC}{Embedding}{bge-small}
-\card{index}{12.6,-1.6}{ragC}{Vector index}{Chroma}
-\card{retr}{18.3,-1.6}{ragC}{Retriever}{top-$k$ relevant chunks}
-\card{prompt}{24.0,-1.6}{ragC}{Prompt}{question + chunks}
+\card{index}{6.9,-1.6}{ragC}{Vector index}{Chroma, bge-small}
+\card{retr}{12.6,-1.6}{ragC}{Retriever}{top-$k$ relevant chunks}
+\card{prompt}{18.3,-1.6}{ragC}{Prompt}{question + chunks}
 
-% (4) DeepCNCF: the one model that writes the answer - fed by fine-tuning AND retrieval
-\node[keycard=modelC, minimum width=52mm, text width=48mm, minimum height=30mm, line width=2.6pt] (deep) at (30.4,2.0)
-  {{\rule{0pt}{6.5mm}\Large\bfseries DeepCNCF}\\[2pt]{\normalsize\color{muted}fine-tuned model\\generates the answer}};
+% DeepCNCF: fed by the fine-tuned model AND the retrieval prompt; its output is the answer
+\node[keycard=modelC, minimum width=50mm, text width=46mm, line width=2.6pt, inner ysep=3mm] (deep) at (25.0,2.0)
+  {\includegraphics[height=27mm]{icons/deepcncf.png}\\[1pt]{\normalsize\color{muted}fine-tuned Gemma}};
 
 % user
-\node[card=askC, minimum width=40mm, text width=36mm, minimum height=14mm] (user) at (18.3,-6.6)
+\node[card=askC, minimum width=40mm, text width=36mm, minimum height=14mm, inner ysep=3mm] (user) at (12.6,-6.6)
   {{\large\bfseries User}};
-\node[keycard=askC, minimum height=14mm] (answer) at (30.4,-6.6)
+\node[keycard=askC, minimum height=14mm, inner ysep=3mm] (answer) at (25.0,-6.6)
   {{\large\bfseries Answer}\\[1pt]{\normalsize\color{muted}with sources}};
 
 % ------------------------------------------------------------- logos
 \badges{src}{dataC}{3}{cncf,stackoverflow,github}
 \badges{scrape}{dataC}{2}{scrapy,python}
 \badges{corpus}{dataC}{1}{huggingface}
-\badges{qa}{modelC}{1}{google}
-\badges{ft}{modelC}{2}{pytorch,huggingface}
+\badges{qa}{modelC}{2}{gemma,stackoverflow}
+\badges{ft}{modelC}{2}{gemma,huggingface}
 \badges{serve}{modelC}{1}{ollama}
-\badges{emb}{ragC}{1}{huggingface}
 \badges{index}{ragC}{1}{chroma}
 \badges{retr}{ragC}{1}{langchain}
 \badges{prompt}{ragC}{1}{langchain}
-\badges{deep}{modelC}{1}{huggingface}
 
 % ------------------------------------------------------------- flows
 \draw[flow] (src) -- (scrape);
 \draw[flow] (scrape) -- (corpus-b1);  % end on the logo badge, not under it
 \draw[flow] (corpus.east) -- ++(12mm,0) |- (qa.west);
-\draw[flow] (corpus) -- (emb);
+\draw[flow] (corpus) -- (index);
 \draw[flow] (qa) -- (ft);
 \draw[flow] (ft) -- (serve);
-\draw[flow] (emb) -- (index);
 \draw[flow] (index) -- (retr);
-\draw[flow, draw=modelC, line width=2.4pt] (serve.east) -| node[pos=0.75, right, font=\normalsize\bfseries, text=modelC] {model} (deep-b1);
+\draw[flow, draw=modelC, line width=2.4pt] (serve.east) -| node[pos=0.75, right, note, text=modelC] {model} (deep.north);
 
-% question path (highlighted): question -> retriever & prompt -> DeepCNCF -> answer -> user
-\coordinate (fork) at ($(user.north)+(0,1.3)$);
-\draw[ask] (user.north) -- (retr.south);
-\draw[ask] (fork) -| (prompt.south);
-\fill[askC] (fork) circle (1.6mm);
-\node[font=\normalsize\bfseries, text=askC, left] at ($(fork)+(-1mm,0)$) {question};
+% periodic refresh of the data pipeline: loop from the corpus back to the sources
+\coordinate (loopx) at ($(corpus.west)+(-13mm,0)$);
+\draw[flow, draw=dataC, dashed, dash pattern=on 5pt off 3pt] (corpus.west) -- (loopx) |- (src.west);
+\node[badge=dataC, minimum width=10mm] (refresh) at (loopx |- scrape) {\includegraphics[width=6.6mm]{icons/refresh}};
+\node[note, text=dataC, rotate=90, anchor=south] (refreshlbl) at ($(refresh.west)+(-1mm,0)$) {re-run periodically};
+
+% question path (highlighted): question -> retriever -> prompt -> DeepCNCF -> answer -> user
+\draw[ask] (user) -- node[right, note, text=askC] {question} (retr);
 \draw[ask] (retr) -- (prompt);
-\draw[ask] (prompt.east) -- ++(9mm,0) |- (deep.west);
+\draw[ask] (prompt.east) -- ++(10mm,0) |- (deep.west);
 \draw[ask] (deep) -- (answer);
 \draw[ask] (answer) -- (user);
 
@@ -113,9 +120,9 @@
 \begin{scope}[on background layer]
   % white canvas first (transparent PNGs look grey on some slide themes), then the panels
   \fill[white] ($(current bounding box.south west)+(-10mm,-8mm)$) rectangle ($(current bounding box.north east)+(10mm,12mm)$);
-  \node[panel=dataC, fit=(src)(scrape)(corpus)] (pData) {};
+  \node[panel=dataC, fit=(src)(scrape)(corpus)(refreshlbl)] (pData) {};
   \node[panel=modelC, fit=(qa)(ft)(serve)] (pModel) {};
-  \node[panel=ragC, fit=(emb)(index)(retr)(prompt)] (pRag) {};
+  \node[panel=ragC, fit=(index)(retr)(prompt)] (pRag) {};
 \end{scope}
 \node[header=dataC]  at ($(pData.north west)+(5mm,0)$)  {\stepnum{dataC}{1}\ \ Data pipeline};
 \node[header=modelC] at ($(pModel.north west)+(5mm,0)$) {\stepnum{modelC}{2}\ \ Fine-tuning \& serving};
