@@ -1,0 +1,118 @@
+% DeepCNCF architecture - presentation version (light background, sized for a 16:9 slide).
+% Build (from this folder):
+%   lualatex architecture-slides.tex      (lualatex, so the Fira Sans OpenType fonts are used directly)
+%   pdftocairo -png -r 300 -singlefile architecture-slides.pdf architecture-slides   # PowerPoint
+%   pdftocairo -svg architecture-slides.pdf architecture-slides.svg                  # PowerPoint 365 / web
+% Logos: see icons/SOURCES.md
+\documentclass[tikz,border=0pt]{standalone}
+\usepackage[T1]{fontenc}
+\usepackage[sfdefault]{FiraSans}
+\usepackage{graphicx}
+\usetikzlibrary{positioning,fit,backgrounds,arrows.meta,calc,shadows}
+
+\definecolor{dataC}{HTML}{2563EB}
+\definecolor{modelC}{HTML}{EA580C}
+\definecolor{ragC}{HTML}{059669}
+\definecolor{askC}{HTML}{7C3AED}
+\definecolor{ink}{HTML}{111827}
+\definecolor{muted}{HTML}{4B5563}
+\definecolor{line}{HTML}{9CA3AF}
+
+% \card{id}{x,y}{colour}{title}{subtitle}
+\newcommand{\card}[5]{%
+  \node[card=#3] (#1) at (#2) {{\large\bfseries #4}\\[1pt]{\normalsize\color{muted}#5}};}
+% \badges{card id}{colour}{number of icons}{icon1,icon2,...}  - white logo circles on the card's top edge
+\newcommand{\badges}[4]{%
+  \foreach \ic [count=\j] in {#4} {
+    \node[badge=#2] (#1-b\j) at ($(#1.north)+({(\j-(#3+1)/2)*1.4},0)$)  % 14 mm apart
+      {\includegraphics[width=6.2mm,height=6.2mm,keepaspectratio]{icons/\ic}};
+  }}
+% \step{colour}{n} - white numbered circle for panel headers
+\newcommand{\stepnum}[2]{\tikz[baseline=(s.base)]\node[circle, fill=white, text=#1, inner sep=0pt,
+  minimum size=5.5mm, font=\normalsize\bfseries] (s) {#2};}
+
+\begin{document}
+\begin{tikzpicture}[
+    card/.style={draw=#1, fill=white, line width=1.4pt, rounded corners=6pt,
+                 minimum width=46mm, minimum height=21mm, text width=42mm,
+                 align=center, inner ysep=5.5mm, text=ink,   % room for the logo badges
+                 drop shadow={opacity=0.12, shadow xshift=0.7mm, shadow yshift=-0.9mm}},
+    keycard/.style={card=#1, fill=#1!10, line width=2pt},
+    badge/.style={circle, draw=#1, fill=white, line width=1.2pt, minimum size=10mm, inner sep=0pt},
+    flow/.style={-{Stealth[length=3.4mm, width=2.8mm]}, line width=1.6pt, draw=line, rounded corners=5pt},
+    ask/.style={flow, draw=askC, line width=2.4pt},
+    panel/.style={fill=#1!5, draw=#1!35, line width=1pt, rounded corners=12pt,
+                  inner xsep=6mm, inner ysep=13mm},
+    header/.style={fill=#1, text=white, rounded corners=5pt, font=\large\bfseries,
+                   inner xsep=3.5mm, inner ysep=2mm, anchor=west},
+]
+
+% ------------------------------------------------------------- cards
+% (1) data pipeline - left column, flowing down
+\card{src}{0,  5.6}{dataC}{CNCF Landscape}{docs, READMEs, PDFs}
+\card{scrape}{0, 2.0}{dataC}{Scraping \& chunking}{Scrapy, Python}
+\node[keycard=dataC] (corpus) at (0,-1.6) {{\large\bfseries CNCF corpus}\\[1pt]{\normalsize\color{muted}Hugging Face dataset}};
+
+% (2) model - top row
+\card{qa}{6.9, 5.6}{modelC}{Q\&A generation}{Gemma}
+\card{ft}{12.6, 5.6}{modelC}{Fine-tuning}{LoRA, Gemma 2B/7B/9B}
+\node[keycard=modelC] (model) at (18.3,5.6) {{\large\bfseries DeepCNCF}\\[1pt]{\normalsize\color{muted}fine-tuned Gemma}};
+\card{serve}{24.0, 5.6}{modelC}{Model serving}{Ollama, LocalAI}
+
+% (3) RAG - bottom row
+\card{emb}{6.9,-1.6}{ragC}{Embedding}{bge-small}
+\card{index}{12.6,-1.6}{ragC}{Vector index}{Chroma}
+\card{retr}{18.3,-1.6}{ragC}{Retriever}{top-$k$ relevant chunks}
+\node[keycard=ragC] (gen) at (24.0,-1.6) {{\large\bfseries Answer generation}\\[1pt]{\normalsize\color{muted}LangChain}};
+
+% user
+\node[card=askC, minimum width=40mm, text width=36mm, minimum height=14mm] (user) at (18.3,-6.1)
+  {{\large\bfseries User}};
+\node[keycard=askC, minimum height=14mm] (answer) at (24.0,-6.1)
+  {{\large\bfseries Answer}\\[1pt]{\normalsize\color{muted}with sources}};
+
+% ------------------------------------------------------------- logos
+\badges{src}{dataC}{3}{cncf,stackoverflow,github}
+\badges{scrape}{dataC}{2}{scrapy,python}
+\badges{corpus}{dataC}{1}{huggingface}
+\badges{qa}{modelC}{1}{google}
+\badges{ft}{modelC}{2}{pytorch,huggingface}
+\badges{model}{modelC}{1}{huggingface}
+\badges{serve}{modelC}{1}{ollama}
+\badges{emb}{ragC}{1}{huggingface}
+\badges{index}{ragC}{1}{chroma}
+\badges{retr}{ragC}{1}{langchain}
+\badges{gen}{ragC}{1}{langchain}
+
+% ------------------------------------------------------------- flows
+\draw[flow] (src) -- (scrape);
+\draw[flow] (scrape) -- (corpus-b1);  % end on the logo badge, not under it
+\draw[flow] (corpus.east) -- ++(12mm,0) |- (qa.west);
+\draw[flow] (corpus) -- (emb);
+\draw[flow] (qa) -- (ft);
+\draw[flow] (ft) -- (model);
+\draw[flow] (model) -- (serve);
+\draw[flow] (emb) -- (index);
+\draw[flow] (index) -- (retr);
+\draw[flow] (serve) -- (gen-b1);
+
+% question path (highlighted)
+\draw[ask] (user) -- node[right, font=\normalsize\bfseries, text=askC] {question} (retr);
+\draw[ask] (retr) -- (gen);
+\draw[ask] (gen) -- (answer);
+\draw[ask] (answer) -- (user);
+
+% ------------------------------------------------------------- panels
+\begin{scope}[on background layer]
+  % white canvas first (transparent PNGs look grey on some slide themes), then the panels
+  \fill[white] ($(current bounding box.south west)+(-10mm,-8mm)$) rectangle ($(current bounding box.north east)+(10mm,12mm)$);
+  \node[panel=dataC, fit=(src)(scrape)(corpus)] (pData) {};
+  \node[panel=modelC, fit=(qa)(ft)(model)(serve)] (pModel) {};
+  \node[panel=ragC, fit=(emb)(index)(retr)(gen)] (pRag) {};
+\end{scope}
+\node[header=dataC]  at ($(pData.north west)+(5mm,0)$)  {\stepnum{dataC}{1}\ \ Data pipeline};
+\node[header=modelC] at ($(pModel.north west)+(5mm,0)$) {\stepnum{modelC}{2}\ \ Fine-tuning \& serving};
+\node[header=ragC]   at ($(pRag.north west)+(5mm,0)$)   {\stepnum{ragC}{3}\ \ Retrieval-augmented generation};
+
+\end{tikzpicture}
+\end{document}
