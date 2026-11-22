@@ -17,7 +17,7 @@ To create a yaml file with the CNCF Lanscape follow this instructions:
 
 1. Poblate with repository data
 
-   1. You will need a Github token to access the API. Refer to [Creating a personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic). Copy and paste it in the appropiate location in the script landscape_explorer.py replacing "test_token".
+   1. You will need a Github token to access the API. Refer to [Creating a personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic). Put it in a `.env` file in the repository root as `GITHUB_TOKEN=...` (copy `.env.example` to `.env`). Never hardcode tokens in the scripts.
 
    1. Go to the folder src/scripts
 
@@ -53,11 +53,12 @@ The 'run_all.sh' script automates environment setup, ETL processes, and Q&A gene
 
 ### Prerequisites
 
-1. **Environment Variables**: Create a `.env` file in the root directory with the following content:
+1. **Environment Variables**: Copy `.env.example` to `.env` in the root directory and fill in your tokens (`.env` is git-ignored):
 
 ```text
 GITHUB_TOKEN=<YOUR_GITHUB_TOKEN>
 HF_TOKEN=<YOUR_HUGGING_FACE_TOKEN>
+API_KEY=<YOUR_STACKEXCHANGE_API_KEY>
 ```
 
 Replace '<YOUR_GITHUB_TOKEN>' with your GitHub token obtained as described earlier, and '<YOUR_HUGGING_FACE_TOKEN>' with your Hugging Face token, which can be found at (https://huggingface.co/settings/tokens)

@@ -43,7 +43,9 @@ import multiprocessing
 
 
 # Replace with your GitHub token to increase github API hourly rate to 5000
-TOKEN = os.getenv('GITHUB_TOKEN', 'Replace your token')
+from dotenv import load_dotenv
+load_dotenv()
+TOKEN = os.getenv('GITHUB_TOKEN')  # set in .env (see .env.example)
 HEADERS = {'Authorization': f'Bearer {TOKEN}',
            'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'}
 

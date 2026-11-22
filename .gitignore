@@ -50,11 +50,19 @@ sources/
 # json files
 *.json
 
-# env file used to run the entire project
+# env files with secrets (only the .env.example templates are committed)
 .env
+.env.*
+!.env.example
 
 *.csv
 
 venv/
 
 model/
+# RAG pipeline (src/rag)
+.venv-rag/
+src/rag/index/
+src/rag/output/
+src/rag/.env
+src/rag/ollama/*.gguf
