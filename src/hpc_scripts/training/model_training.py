@@ -1,6 +1,8 @@
 from huggingface_hub import HfApi, login
 import os
-HF_TOKEN = os.getenv('HF_TOKEN', 'add_hf_token')
+from dotenv import load_dotenv
+load_dotenv()
+HF_TOKEN = os.getenv('HF_TOKEN')  # set in .env (see .env.example)
 api = HfApi()
 login(HF_TOKEN, add_to_git_credential=True)
 

@@ -57,7 +57,7 @@ import threading
 import multiprocessing
 
 load_dotenv()
-API_KEY = os.getenv('API_KEY', 'Replace your api key')
+API_KEY = os.getenv('API_KEY')  # set in .env (see .env.example)
 REQUEST_DELAY = 0  # Number of seconds to wait between requests
 
 CSV_FILE = 'sources/stackoverflow_Q&A/cncf_stackoverflow_qas.csv'

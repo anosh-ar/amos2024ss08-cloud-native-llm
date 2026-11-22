@@ -19,7 +19,7 @@ Usage Example:
 - Progress is displayed using tqdm during file upload.
 
 Note:
-- Ensure the environment variable `HF_TOKEN` is set to your Hugging Face API token or provide it directly in the script.
+- Ensure the environment variable `HF_TOKEN` is set to your Hugging Face API token (e.g. in a `.env` file).
 - The script checks if the provided `repo_id` corresponds to a model repository before proceeding with file upload.
 
 """
@@ -31,7 +31,9 @@ from tqdm import tqdm
 from typing import Optional
 
 os.environ["HF_HUB_ENABLE_HF_TRANSFER"] = "1"
-HF_TOKEN = os.getenv("HF_TOKEN", "upload_your_hf_token_here")
+from dotenv import load_dotenv
+load_dotenv()
+HF_TOKEN = os.getenv("HF_TOKEN")  # set in .env (see .env.example)
 
 
 def get_file_paths(directory_path: str, base_path: str = "", res: Optional[list[str]] = None) -> list[str]:

@@ -25,7 +25,9 @@ import argparse
 from huggingface_hub import HfApi, login
 
 os.environ["HF_HUB_ENABLE_HF_TRANSFER"] = "1"
-HF_TOKEN = os.getenv('HF_TOKEN', 'Replace your token')
+from dotenv import load_dotenv
+load_dotenv()
+HF_TOKEN = os.getenv('HF_TOKEN')  # set in .env (see .env.example)
 
 
 def upload_to_huggingface(directory_path: str, hf_dataset_id: str) -> None:

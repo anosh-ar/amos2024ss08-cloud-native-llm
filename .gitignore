@@ -50,8 +50,10 @@ sources/
 # json files
 *.json
 
-# env file used to run the entire project
+# env files with secrets (only the .env.example templates are committed)
 .env
+.env.*
+!.env.example
 
 *.csv
 

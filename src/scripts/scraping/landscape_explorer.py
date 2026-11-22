@@ -33,9 +33,11 @@ import requests_cache
 import logging
 import time
 import collections
+from dotenv import load_dotenv
+load_dotenv()
 
 
-TOKEN = os.getenv('GITHUB_TOKEN', "Replace your token")
+TOKEN = os.getenv('GITHUB_TOKEN')  # set in .env (see .env.example)
 HEADERS = {'Authorization': f'Bearer {TOKEN}',
            'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'}
 BASE_API_URL = 'https://api.github.com'

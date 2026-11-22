@@ -13,12 +13,12 @@ Usage Example:
 - The script expects two arguments when executed:
   - `file_path`: The path to the CSV file to upload.
   - `hf_dataset_id`: The ID of the Hugging Face dataset repository where the file will be uploaded.
-- It logs into Hugging Face using the `HF_TOKEN` environment variable (or a default token if not set).
+- It logs into Hugging Face using the `HF_TOKEN` environment variable (loaded from `.env`).
 - It uploads the specified CSV file to the specified dataset repository.
 - Progress of the upload is displayed using a tqdm progress bar.
 
 Notes:
-- Ensure the environment variable `HF_TOKEN` is set to your Hugging Face API token or provide it directly in the script.
+- Ensure the environment variable `HF_TOKEN` is set to your Hugging Face API token (e.g. in a `.env` file).
 - The script uses `os.path.basename(file_path)` to determine the file name in the repository.
 - The repository type is specified as "dataset" during the upload.
 
@@ -29,7 +29,9 @@ from tqdm import tqdm
 from huggingface_hub import HfApi, login
 
 os.environ["HF_HUB_ENABLE_HF_TRANSFER"] = "1"
-HF_TOKEN = os.getenv("HF_TOKEN", "upload_your_hf_token_here")
+from dotenv import load_dotenv
+load_dotenv()
+HF_TOKEN = os.getenv("HF_TOKEN")  # set in .env (see .env.example)
 
 
 def upload_QandA_to_huggingface(file_path: str, hf_dataset_id: str) -> None:

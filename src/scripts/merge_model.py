@@ -1,8 +1,10 @@
 from transformers import AutoModelForCausalLM
 from peft import PeftModel
 import os
+from dotenv import load_dotenv
+load_dotenv()
 
-HF_TOKEN = os.getenv('HF_TOKEN', 'add_hf_token')
+HF_TOKEN = os.getenv('HF_TOKEN')  # set in .env (see .env.example)
 base_model_name = "google/gemma-2b-it"
 adapter_model_name = "julioc-p/DeepCNCFGemma2B"
 repo_id = "julioc-p/CNCF"
